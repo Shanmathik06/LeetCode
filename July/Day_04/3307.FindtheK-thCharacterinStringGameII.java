@@ -1,34 +1,28 @@
 //Question : https://leetcode.com/problems/find-the-k-th-character-in-string-game-ii/
 class Solution {
     public char kthCharacter(long k, int[] operations) {
-        
-        return solve(k,operations,operations.length);
-    }
+        int shift = 0; // total number of +1 (mod 26) operations
+        List<Long> lengths = new ArrayList<>();
+        long len = 1;
 
-   private char solve(long k, int[] operations, int n) {
-    char result = 'a';
-
-    while (n > 0) {
-        long left = 1;
-        long right = (long) Math.pow(2, n);
-        long mid = left + (right - left) / 2;
-        int flip = operations[n - 1];
-
-        if (k <= mid) {
-            // go to left half, just reduce n
-            n--;
-        } else {
-            // right half
-            k = k - mid;
-            if (flip == 1) {
-                // simulate character increment
-                result = result == 'z' ? 'a' : (char)(result + 1);
-            }
-            n--;
+        for (int op : operations) {
+            len *= 2;
+            lengths.add(len);
+            if (len >= k) break;
         }
+
+        for (int i = lengths.size() - 1; i >= 0; i--) {
+            long half = lengths.get(i) / 2;
+            int op = operations[i];
+
+            if (k > half) {
+                k -= half;
+                if (op == 1) shift++;
+            }
+            // else: k remains the same
+        }
+
+        // Apply total shift from 'a'
+        return (char) ((('a' - 'a' + shift) % 26) + 'a');
     }
-
-    return result;
-   }
-
 }
